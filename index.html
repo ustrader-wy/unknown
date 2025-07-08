@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YQT BOT PRO</title>
+  <style>
+    body {
+      background-color: #1a202c;
+      color: white;
+      font-family: sans-serif;
+      padding: 2rem;
+    }
+    select, button {
+      background-color: #2d3748;
+      color: white;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      border: none;
+      margin-top: 0.25rem;
+      width: 100%;
+    }
+    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .card { background-color: #2d3748; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+    .signal-box { padding: 1rem; border-radius: 0.5rem; font-weight: bold; }
+    .green { background-color: #38a169; }
+    .red { background-color: #e53e3e; }
+    .yellow { background-color: #d69e2e; }
+    .spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 0.5rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem;">💹 YQT BOT PRO</h1>
+
+  <div class="card">
+    <div class="grid">
+      <div>
+        <label>Select Broker</label>
+        <select id="broker">
+          <option>Quotex</option>
+          <option>Pocket Option</option>
+          <option>IQ Option</option>
+          <option>Olymp Trade</option>
+          <option>Binomo</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Select Pair</label>
+        <select id="pair">
+          <option>EUR/USD</option>
+          <option>GBP/USD</option>
+          <option>USD/JPY</option>
+          <option>AUD/USD</option>
+          <option>USD/CHF</option>
+          <option>NZD/USD</option>
+          <option>EUR/GBP</option>
+          <option>BTC/USD</option>
+          <option>ETH/USD</option>
+          <option>XAU/USD</option>
+          <option>USD/CAD</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Select Timeframe</label>
+        <select id="timeframe">
+          <option>15s</option>
+          <option>30s</option>
+          <option selected>1m</option>
+          <option>2m</option>
+          <option>5m</option>
+          <option>15m</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button id="signalBtn" onclick="generateSignal()">🔍 Get Signal</button>
+  <div id="signalOutput" style="margin-top: 1rem;"></div>
+
+  <script>
+    function calculateIndicators() {
+      const macdLine = Math.random() * 2 - 1;
+      const signalLine = Math.random() * 2 - 1;
+      const ema5 = Math.random() * 100;
+      const ema13 = Math.random() * 100;
+      const price = Math.random() * 100;
+      const lowerBB = price - Math.random() * 5;
+      const upperBB = price + Math.random() * 5;
+      const adx = 20 + Math.random() * 30;
+      const heikinAshi = Math.random() > 0.5 ? 'green' : 'red';
+
+      return { macdLine, signalLine, ema5, ema13, price, lowerBB, upperBB, adx, heikinAshi };
+    }
+
+    function getSignal(data) {
+      const { macdLine, signalLine, ema5, ema13, price, lowerBB, upperBB, adx, heikinAshi } = data;
+
+      if (
+        macdLine > signalLine &&
+        ema5 > ema13 &&
+        price <= lowerBB &&
+        adx > 25 &&
+        heikinAshi === 'green'
+      ) return '📈 CALL (Buy)';
+
+      if (
+        macdLine < signalLine &&
+        ema5 < ema13 &&
+        price >= upperBB &&
+        adx > 25 &&
+        heikinAshi === 'red'
+      ) return '📉 PUT (Sell)';
+
+      return '⏸ NO SIGNAL';
+    }
+
+    function generateSignal() {
+      const btn = document.getElementById('signalBtn');
+      const output = document.getElementById('signalOutput');
+      btn.disabled = true;
+      output.innerHTML = '<div class="spinner"></div> Analyzing...';
+
+      setTimeout(() => {
+        const indicators = calculateIndicators();
+        const result = getSignal(indicators);
+        const broker = document.getElementById('broker').value;
+        const pair = document.getElementById('pair').value;
+        const tf = document.getElementById('timeframe').value;
+
+        let bg = 'yellow';
+        if (result.includes('CALL')) bg = 'green';
+        else if (result.includes('PUT')) bg = 'red';
+
+        output.innerHTML = `<div class='signal-box ${bg}'>📢 Signal: ${result}<br/>Broker: ${broker} | Pair: ${pair} | Timeframe: ${tf}</div>`;
+        btn.disabled = false;
+      }, 2000);
+    }
+  </script>
+
+</body>
+</html>
