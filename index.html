@@ -1,171 +1,195 @@
-# Full updated HTML code with "NO SIGNAL" removed and fallback signal added
-html_updated_code = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YQT BOT PRO</title>
+  <title>Trader Bhai BOT</title>
   <style>
     body {
-      background-color: #1a202c;
-      color: white;
+      background: #111;
       font-family: sans-serif;
-      padding: 2rem;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .bot-container {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px #ff0033;
+      width: 320px;
+      text-align: center;
+      color: white;
+    }
+    .bot-logo {
+      width: 80px;
+      margin-bottom: 10px;
     }
     select, button {
-      background-color: #2d3748;
-      color: white;
-      padding: 0.5rem;
-      border-radius: 0.25rem;
-      border: none;
-      margin-top: 0.25rem;
       width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: none;
+      background: #333;
+      color: white;
+      font-size: 16px;
     }
-    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-    .card { background-color: #2d3748; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
-    .signal-box { padding: 1rem; border-radius: 0.5rem; font-weight: bold; }
-    .green { background-color: #38a169; }
-    .red { background-color: #e53e3e; }
-    .yellow { background-color: #d69e2e; }
-    .spinner {
-      display: inline-block;
-      width: 1rem;
-      height: 1rem;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
+    .time-box {
+      background: red;
+      padding: 12px;
+      font-size: 20px;
+      border-radius: 5px;
+    }
+    .get-signal-btn {
+      background: cyan;
+      font-weight: bold;
+      color: #000;
+      cursor: pointer;
+    }
+    .signal-result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .loader {
+      border: 3px solid #ccc;
+      border-top: 3px solid #fff;
       border-radius: 50%;
+      width: 20px;
+      height: 20px;
       animation: spin 1s linear infinite;
-      margin-right: 0.5rem;
+      display: inline-block;
+      margin-right: 8px;
     }
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .telegram {
+      margin-top: 20px;
+      font-size: 14px;
+      background: #000;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .telegram a {
+      color: #00f0ff;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
 
-  <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem;">💹 YQT BOT PRO</h1>
+  <div class="bot-container">
+    <img src="https://i.ibb.co/JvVhHNR/logo.png" alt="Bot Logo" class="bot-logo" />
+    
+    <label>ASSET</label>
+    <select id="asset">
+      <option>EUR/USD (OTC)</option>
+      <option>GBP/USD (OTC)</option>
+      <option>USD/JPY (OTC)</option>
+      <option>USD/CHF (OTC)</option>
+      <option>USD/CAD (OTC)</option>
+      <option>AUD/USD (OTC)</option>
+      <option>NZD/USD (OTC)</option>
+      <option>EUR/GBP (OTC)</option>
+      <option>EUR/JPY (OTC)</option>
+      <option>GBP/JPY (OTC)</option>
+      <option>BTC/USD</option>
+      <option>ETH/USD</option>
+    </select>
 
-  <div class="card">
-    <div class="grid">
-      <div>
-        <label>Select Broker</label>
-        <select id="broker">
-          <option>Quotex</option>
-          <option>Pocket Option</option>
-          <option>IQ Option</option>
-          <option>Olymp Trade</option>
-          <option>Binomo</option>
-        </select>
-      </div>
+    <label>TIMEFRAME</label>
+    <select id="timeframe">
+      <option>15s</option>
+      <option>30s</option>
+      <option selected>1m</option>
+      <option>2m</option>
+      <option>5m</option>
+      <option>15m</option>
+    </select>
 
-      <div>
-        <label>Select Pair</label>
-        <select id="pair">
-          <option>EUR/USD</option>
-          <option>GBP/USD</option>
-          <option>USD/JPY</option>
-          <option>AUD/USD</option>
-          <option>USD/CHF</option>
-          <option>NZD/USD</option>
-          <option>EUR/GBP</option>
-          <option>BTC/USD</option>
-          <option>ETH/USD</option>
-          <option>XAU/USD</option>
-          <option>USD/CAD</option>
-        </select>
-      </div>
+    <label>SIGNAL</label>
+    <div id="signal" style="background:#444; padding:12px; border-radius:5px;">--</div>
 
-      <div>
-        <label>Select Timeframe</label>
-        <select id="timeframe">
-          <option>15s</option>
-          <option>30s</option>
-          <option selected>1m</option>
-          <option>2m</option>
-          <option>5m</option>
-          <option>15m</option>
-        </select>
-      </div>
+    <div class="time-box">1:00 ⏱</div>
+
+    <button class="get-signal-btn" onclick="generateSignal()">GET SIGNAL</button>
+
+    <div id="result" class="signal-result"></div>
+
+    <div class="telegram">
+      👉 Join Telegram Channel: <a href="https://t.me/TraderBhai77" target="_blank">@TraderBhai77</a>
     </div>
   </div>
 
-  <button id="signalBtn" onclick="generateSignal()">🔍 Get Signal</button>
-  <div id="signalOutput" style="margin-top: 1rem;"></div>
+  <audio id="alertSound" src="https://assets.mixkit.co/sfx/download/mixkit-alert-bells-echo-765.wav"></audio>
 
   <script>
-    function calculateIndicators() {
-      const macdLine = Math.random() * 2 - 1;
-      const signalLine = Math.random() * 2 - 1;
-      const ema5 = Math.random() * 100;
-      const ema13 = Math.random() * 100;
-      const price = Math.random() * 100;
-      const lowerBB = price - Math.random() * 5;
-      const upperBB = price + Math.random() * 5;
-      const adx = 20 + Math.random() * 30;
-      const heikinAshi = Math.random() > 0.5 ? 'green' : 'red';
-
-      return { macdLine, signalLine, ema5, ema13, price, lowerBB, upperBB, adx, heikinAshi };
-    }
-
-    function getSignal(data) {
-      const { macdLine, signalLine, ema5, ema13, price, lowerBB, upperBB, adx, heikinAshi } = data;
-
-      if (
-        macdLine > signalLine &&
-        ema5 > ema13 &&
-        price <= lowerBB &&
-        adx > 25 &&
-        heikinAshi === 'green'
-      ) return '📈 CALL (Buy)';
-
-      if (
-        macdLine < signalLine &&
-        ema5 < ema13 &&
-        price >= upperBB &&
-        adx > 25 &&
-        heikinAshi === 'red'
-      ) return '📉 PUT (Sell)';
-
-      // Fallback: always return a signal (no "NO SIGNAL")
-      return Math.random() > 0.5 ? '📈 CALL (Buy)' : '📉 PUT (Sell)';
-    }
-
     function generateSignal() {
-      const btn = document.getElementById('signalBtn');
-      const output = document.getElementById('signalOutput');
-      btn.disabled = true;
-      output.innerHTML = '<div class="spinner"></div> Analyzing...';
+      const signalBox = document.getElementById('signal');
+      const result = document.getElementById('result');
+      const alertSound = document.getElementById('alertSound');
+
+      signalBox.innerHTML = '<div class="loader"></div> Analyzing...';
+      result.textContent = '';
 
       setTimeout(() => {
-        const indicators = calculateIndicators();
-        const result = getSignal(indicators);
-        const broker = document.getElementById('broker').value;
-        const pair = document.getElementById('pair').value;
-        const tf = document.getElementById('timeframe').value;
+        // Simulated indicators
+        const macd = Math.random() > 0.5;
+        const ema5 = Math.random() * 100;
+        const ema20 = Math.random() * 100;
+        const price = Math.random() * 100;
+        const bollLow = price - 2 + Math.random() * 2;
+        const bollHigh = price + 2 + Math.random() * 2;
+        const adx = 20 + Math.random() * 30;
+        const heikin = Math.random() > 0.5 ? 'green' : 'red';
+        const stochastic = Math.random() * 100;
+        const momentum = Math.random() * 100;
+        const volumePower = Math.random() * 100;
 
-        let bg = 'yellow';
-        if (result.includes('CALL')) bg = 'green';
-        else if (result.includes('PUT')) bg = 'red';
+        let signal = "📈 CALL (Buy)";
+        if (
+          macd &&
+          ema5 > ema20 &&
+          price < bollLow &&
+          adx > 25 &&
+          heikin === "green" &&
+          stochastic < 50 &&
+          momentum > 50 &&
+          volumePower > 40
+        ) {
+          signal = "📈 CALL (Buy)";
+        } else if (
+          !macd &&
+          ema5 < ema20 &&
+          price > bollHigh &&
+          adx > 25 &&
+          heikin === "red" &&
+          stochastic > 50 &&
+          momentum < 50 &&
+          volumePower < 60
+        ) {
+          signal = "📉 PUT (Sell)";
+        } else {
+          signal = Math.random() > 0.5 ? "📈 CALL (Buy)" : "📉 PUT (Sell)";
+        }
 
-        output.innerHTML = `<div class='signal-box ${bg}'>📢 Signal: ${result}<br/>Broker: ${broker} | Pair: ${pair} | Timeframe: ${tf}</div>`;
-        btn.disabled = false;
+        signalBox.textContent = signal;
+        result.textContent = "✅ Signal Generated!";
+        alertSound.play();
       }, 2000);
     }
+
+    // Auto-refresh every 60 seconds
+    setInterval(() => {
+      generateSignal();
+    }, 60000);
   </script>
 
 </body>
 </html>
-"""
-
-# Write the updated HTML content to file
-html_file_path = "/mnt/data/yqt-bot-pro.html"
-with open(html_file_path, "w") as f:
-    f.write(html_updated_code)
-
-# Zip the HTML file
-zip_file_path = "/mnt/data/yqt-bot-pro.zip"
-with zipfile.ZipFile(zip_file_path, "w") as zipf:
-    zipf.write(html_file_path, arcname="yqt-bot-pro.html")
-
-zip_file_path
