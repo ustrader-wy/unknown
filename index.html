@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+# Full updated HTML code with "NO SIGNAL" removed and fallback signal added
+html_updated_code = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -126,7 +127,8 @@
         heikinAshi === 'red'
       ) return '📉 PUT (Sell)';
 
-      return '⏸ NO SIGNAL';
+      // Fallback: always return a signal (no "NO SIGNAL")
+      return Math.random() > 0.5 ? '📈 CALL (Buy)' : '📉 PUT (Sell)';
     }
 
     function generateSignal() {
@@ -154,3 +156,16 @@
 
 </body>
 </html>
+"""
+
+# Write the updated HTML content to file
+html_file_path = "/mnt/data/yqt-bot-pro.html"
+with open(html_file_path, "w") as f:
+    f.write(html_updated_code)
+
+# Zip the HTML file
+zip_file_path = "/mnt/data/yqt-bot-pro.zip"
+with zipfile.ZipFile(zip_file_path, "w") as zipf:
+    zipf.write(html_file_path, arcname="yqt-bot-pro.html")
+
+zip_file_path
