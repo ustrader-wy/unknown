@@ -20,13 +20,9 @@
       padding: 20px;
       border-radius: 15px;
       box-shadow: 0 0 30px #ff0033;
-      width: 320px;
+      width: 330px;
       text-align: center;
       color: white;
-    }
-    .bot-logo {
-      width: 80px;
-      margin-bottom: 10px;
     }
     select, button {
       width: 100%;
@@ -85,8 +81,6 @@
 <body>
 
   <div class="bot-container">
-    <img src="https://i.ibb.co/JvVhHNR/logo.png" alt="Bot Logo" class="bot-logo" />
-    
     <label>ASSET</label>
     <select id="asset">
       <option>EUR/USD (OTC)</option>
@@ -98,7 +92,6 @@
       <option>NZD/USD (OTC)</option>
       <option>EUR/GBP (OTC)</option>
       <option>EUR/JPY (OTC)</option>
-      <option>GBP/JPY (OTC)</option>
       <option>BTC/USD</option>
       <option>ETH/USD</option>
     </select>
@@ -116,9 +109,9 @@
     <label>SIGNAL</label>
     <div id="signal" style="background:#444; padding:12px; border-radius:5px;">--</div>
 
-    <div class="time-box">1:00 ⏱</div>
+    <div class="time-box" id="countdown">1:00 ⏱</div>
 
-    <button class="get-signal-btn" onclick="generateSignal()">GET SIGNAL</button>
+    <button class="get-signal-btn" onclick="manualSignal()">GET SIGNAL</button>
 
     <div id="result" class="signal-result"></div>
 
@@ -130,11 +123,12 @@
   <audio id="alertSound" src="https://assets.mixkit.co/sfx/download/mixkit-alert-bells-echo-765.wav"></audio>
 
   <script>
-    function generateSignal() {
-      const signalBox = document.getElementById('signal');
-      const result = document.getElementById('result');
-      const alertSound = document.getElementById('alertSound');
+    const signalBox = document.getElementById('signal');
+    const result = document.getElementById('result');
+    const alertSound = document.getElementById('alertSound');
+    const countdownEl = document.getElementById('countdown');
 
+    function generateSignal() {
       signalBox.innerHTML = '<div class="loader"></div> Analyzing...';
       result.textContent = '';
 
@@ -151,6 +145,10 @@
         const stochastic = Math.random() * 100;
         const momentum = Math.random() * 100;
         const volumePower = Math.random() * 100;
+        const cci = Math.random() * 200 - 100;
+        const sarFlip = Math.random() > 0.5;
+        const candleStrength = Math.random() * 100;
+        const volatility = Math.random() * 100;
 
         let signal = "📈 CALL (Buy)";
         if (
@@ -161,7 +159,11 @@
           heikin === "green" &&
           stochastic < 50 &&
           momentum > 50 &&
-          volumePower > 40
+          volumePower > 40 &&
+          cci > 50 &&
+          sarFlip &&
+          candleStrength > 50 &&
+          volatility > 30
         ) {
           signal = "📈 CALL (Buy)";
         } else if (
@@ -172,7 +174,11 @@
           heikin === "red" &&
           stochastic > 50 &&
           momentum < 50 &&
-          volumePower < 60
+          volumePower < 60 &&
+          cci < -50 &&
+          !sarFlip &&
+          candleStrength < 50 &&
+          volatility > 30
         ) {
           signal = "📉 PUT (Sell)";
         } else {
@@ -185,10 +191,33 @@
       }, 2000);
     }
 
-    // Auto-refresh every 60 seconds
-    setInterval(() => {
+    function startCountdown(duration) {
+      let time = duration;
+      const interval = setInterval(() => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        countdownEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds} ⏱`;
+        time--;
+
+        if (time < 0) {
+          clearInterval(interval);
+          generateSignal();
+          startCountdown(60);
+        }
+      }, 1000);
+    }
+
+    // Manual trigger
+    function manualSignal() {
       generateSignal();
-    }, 60000);
+      startCountdown(60);
+    }
+
+    // Auto-start on load
+    window.onload = () => {
+      generateSignal();
+      startCountdown(60);
+    };
   </script>
 
 </body>
